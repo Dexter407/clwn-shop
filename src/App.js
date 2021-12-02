@@ -1,6 +1,8 @@
 import "./App.css";
 import HomePage from "./pages/homepage/homepage.component";
 import Directory from "./components/directory/directory.component";
+import Header from "./components/header/header.component";
+import SignInAndSignUp from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 import {
   BrowserRouter as Router,
   Routes,
@@ -52,10 +54,12 @@ const TopicDetail = (props) => {
 function App() {
   return (
     <div>
+      <Header />
       <Routes>
         <Route exact path="/" element={<Directory />}></Route>
         <Route exact path="/shop" element={<ShopPage />}></Route>
-        <Route exact path="hats" element={<HatsPage />}></Route>
+        <Route exact path="/signin" element={<SignInAndSignUp />}></Route>
+        <Route exact path="/hats" element={<HatsPage />}></Route>
         <Route path="hats/:topicId" element={<TopicDetail />} />
       </Routes>
     </div>
