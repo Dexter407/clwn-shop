@@ -12,6 +12,7 @@ import {
   useResolvedPath,
   useLocation,
 } from "react-router-dom";
+import ShopPage from "./pages/shop/shop.component";
 
 const HatsPage = (props) => {
   console.log(props);
@@ -53,9 +54,9 @@ function App() {
     <div>
       <Routes>
         <Route exact path="/" element={<Directory />}></Route>
+        <Route exact path="/shop" element={<ShopPage />}></Route>
         <Route exact path="hats" element={<HatsPage />}></Route>
         <Route path="hats/:topicId" element={<TopicDetail />} />
-        {/* <Route path="/hats/:topicId" element={<TopicDetail />}></Route> */}
       </Routes>
     </div>
   );
