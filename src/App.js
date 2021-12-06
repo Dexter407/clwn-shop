@@ -1,8 +1,5 @@
 import "./App.css";
-import HomePage from "./pages/homepage/homepage.component";
-import Directory from "./components/directory/directory.component";
-import Header from "./components/header/header.component";
-import SignInAndSignUp from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -14,10 +11,14 @@ import {
   useResolvedPath,
   useLocation,
 } from "react-router-dom";
+import HomePage from "./pages/homepage/homepage.component";
 import ShopPage from "./pages/shop/shop.component";
+import Directory from "./components/directory/directory.component";
+import Header from "./components/header/header.component";
+import SignInAndSignUp from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
+import { auth, createUserProfileDocument } from "./firebase/firebase.utils";
 
 const HatsPage = (props) => {
-  console.log(props);
   let navigate = useNavigate();
 
   return (
@@ -41,7 +42,6 @@ const HatsPage = (props) => {
 };
 
 const TopicDetail = (props) => {
-  console.log(props);
   let params = useParams();
   return (
     <div>
@@ -51,19 +51,59 @@ const TopicDetail = (props) => {
   );
 };
 
-function App() {
-  return (
-    <div>
-      <Header />
-      <Routes>
-        <Route exact path="/" element={<Directory />}></Route>
-        <Route exact path="/shop" element={<ShopPage />}></Route>
-        <Route exact path="/signin" element={<SignInAndSignUp />}></Route>
-        <Route exact path="/hats" element={<HatsPage />}></Route>
-        <Route path="hats/:topicId" element={<TopicDetail />} />
-      </Routes>
-    </div>
-  );
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      currentUser: null,
+    };
+  }
+
+  unsubscribeFromAuth = null;
+
+  componentDidMount() {
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth);
+
+        userRef.onSnapshot((snapShot) => {
+          this.setState(
+            {
+              currentUser: {
+                id: snapShot.id,
+                ...snapShot.data(),
+              },
+            },
+            () => {
+              console.log(this.state);
+            }
+          );
+        });
+      }
+
+      this.setState({ currentUser: userAuth });
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeFromAuth();
+  }
+
+  render() {
+    return (
+      <div>
+        <Header currentUser={this.state.currentUser} />
+        <Routes>
+          <Route exact path="/" element={<Directory />}></Route>
+          <Route exact path="/shop" element={<ShopPage />}></Route>
+          <Route exact path="/signin" element={<SignInAndSignUp />}></Route>
+          <Route exact path="/hats" element={<HatsPage />}></Route>
+          <Route path="hats/:topicId" element={<TopicDetail />} />
+        </Routes>
+      </div>
+    );
+  }
 }
 
 export default App;
